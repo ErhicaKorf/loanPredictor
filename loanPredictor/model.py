@@ -1,9 +1,3 @@
-#%%
-data_final_vars=data_final.columns.values.tolist()
-y_train=data_final['good_bad_num']
-# data_final = data_final.drop(['good_bad_flag'], axis=1)
-
-X_train=data_final.loc[:, data_final.columns != 'good_bad_num']
 
 #%%
 y.dtype
@@ -12,34 +6,43 @@ X['birthdate'].values
 X['customerid'].values
 
 # %%
-logit_model=sm.Logit(np.asarray(y),np.asarray(X))
-result=logit_model.fit()
-print(result.summary2())
-
-# %%
 y_train = data_final['good_bad_num']
 X_train = data_final.loc[:, data_final.columns != 'good_bad_num']
 X_train = X.drop(['customerid'], axis=1)
 X_train = X.drop(['birthdate'], axis=1)
 
 
-
-LR = LogisticRegression(random_state=0, solver='lbfgs', multi_class='ovr').fit(X, y)
-LR.predict(X)
-round(LR.score(X,y), 4)
 # %%
-### Support Vector Machine
-SVM = svm.LinearSVC()
-SVM.fit(X, y)
-SVM.predict(X)
-round(SVM.score(X,y), 4)
-
-
-# %%
-# Remove two columns name is 'C' and 'D' 
+# Remove columns 
 X_train = X_train.drop(['customerid','birthdate','approveddate_x', 'creationdate_x','approveddate_y',
 'creationdate_y','closeddate','firstduedate','firstrepaiddate',
 'referredby_y','referredby_x'], axis = 1) 
+
+#%%
+# LOGISTIC REGRESSION FEATURE SELECTION
+logreg = LogisticRegression()
+rfe = RFE(logreg, 20)
+rfe = rfe.fit(X_train, y_train.values.ravel())
+print(rfe.support_)
+print(rfe.ranking_)
+
+#%%
+logit_model=sm.Logit(y_train,X_train)
+result=logit_model.fit()
+print(result.summary2())
+
+#%%
+cols = ['longitude_gps','latitude_gps','systemloanid_x','loannumber_x',
+'loanamount_x', 'totaldue_x', 'termdays_x', 'systemloanid_y',
+       'loannumber_y', 'loanamount_y', 'totaldue_y', 'termdays_y',
+       'bank_account_type_Other',
+       'bank_account_type_Savings','bank_name_clients_Diamond Bank', 'bank_name_clients_EcoBank',
+       'bank_name_clients_Stanbic IBTC','employment_status_clients_Permanent',
+       'employment_status_clients_Self-Employed','level_of_education_clients_Graduate']
+
+X_train = X_train[cols]
+
+
 
 #%%
 # LOGISTIC REGRESSION
@@ -104,10 +107,13 @@ print('Accuracy of SVM classifier on test set: {:.2f}'
 
 
 # %%
+# TESTING THE PREDICTIONS FOR TEST SET DECISION CLASSIFIER
 pred = clf.predict(x_test)
 print(confusion_matrix(y_test, pred))
 print(classification_report(y_test, pred))
+
 # %%
+# TESTING THE PREDICTIONS FOR TEST SET KNN
 pred = knn.predict(x_test)
 print(confusion_matrix(y_test, pred))
 print(classification_report(y_test, pred))
