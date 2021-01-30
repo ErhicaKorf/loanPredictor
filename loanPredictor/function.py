@@ -145,7 +145,8 @@ def loanPredictor(df_test_demo,df_train_demo,df_test_perf,df_train_perf,df_test_
     df_test_merged_pred.insert(0, 'customerid', customerid_col)
     df_test_merged_pred.insert(1, 'Good_Bad_Flag', good_bad_col)
 
-    print(df_test_merged_pred[['customerid','Good_Bad_Flag']])
+    df_test_merged_pred[['customerid','Good_Bad_Flag']].to_csv(r'C:/Users/erhicakorf/Documents/GitHub/erhica_korf_ds_assessment_30012021/Predictions.csv', index = False)
+
 # %%
 loanPredictor(df_test_demo,df_train_demo,df_test_perf,df_train_perf,df_test_prev,df_train_prev)
 # %%
