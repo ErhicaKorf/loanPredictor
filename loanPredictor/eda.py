@@ -38,11 +38,16 @@ df_train_merged.isnull().sum()
 # pd.crosstab(df_train_merged.birthdate,df_train_merged.good_bad_flag).plot(kind='bar')
 # table=pd.crosstab(df_train_merged.loanamount_x,df_train_merged.good_bad_flag)
 # table.div(table.sum(1).astype(float), axis=0).plot(kind='bar', stacked=True)
-df_train_merged.level_of_education_clients.hist()
+# df_train_merged.level_of_education_clients.hist()
 # %%
 df_train_merged.groupby('good_bad_flag').mean()
 # %%
 df_train_merged.groupby('level_of_education_clients').mean()
 
 
+# %%
+df_train_merged['good_bad_flag'][(df_train_merged['employment_status_clients']=='Permanent')&(df_train_merged['good_bad_flag']=='Bad')]
+
+#%%
+df_train_merged['good_bad_flag'][df_train_merged['employment_status_clients']=='Permanent']
 # %%
