@@ -38,5 +38,4 @@ data_final_test=df_test_merged[to_keep]
 data_final_test.columns.values
 
 # %%
-data_final_test['Good_Bad_Flag'] = pred
 # %%

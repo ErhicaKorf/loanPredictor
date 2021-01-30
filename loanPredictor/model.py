@@ -8,7 +8,9 @@ X['customerid'].values
 # %%
 y_train = data_final['good_bad_num']
 X_train = data_final.loc[:, data_final.columns != 'good_bad_num']
-
+X_train = X_train.drop(['customerid','birthdate','approveddate_x', 'creationdate_x','approveddate_y',
+        'creationdate_y','good_bad_flag','closeddate','firstduedate','firstrepaiddate',
+        'referredby_y','referredby_x'], axis = 1) 
 #%%
 # LOGISTIC REGRESSION FEATURE SELECTION
 logreg = LogisticRegression()
@@ -106,13 +108,17 @@ print(classification_report(y_test, pred))
 
 # %%
 # PREDICT LOAN GOOD BAD FLAG ON REAL TEST DATA
-df_test_merged = df_test_merged[cols]
-pred = clf.predict(df_test_merged)
+df_test_merged_pred = df_test_merged[cols]
+pred = clf.predict(df_test_merged_pred)
 
 # Add predictions to test data set
-df_test_merged['Good_Bad_Flag'] = pred
+df_test_merged_pred['Good_Bad_Flag'] = pred
 
 # Move to second column
-good_bad_col = df_test_merged.pop('Good_Bad_Flag')
-df_test_merged.insert(1, 'Good_Bad_Flag', good_bad_col)
+good_bad_col = df_test_merged_pred.pop('Good_Bad_Flag')
+customerid_col = df_test_merged.pop('customerid')
+df_test_merged_pred.insert(0, 'customerid', customerid_col)
+df_test_merged_pred.insert(1, 'Good_Bad_Flag', good_bad_col)
+
+
 # %%
