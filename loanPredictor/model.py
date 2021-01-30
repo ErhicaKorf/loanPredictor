@@ -8,15 +8,6 @@ X['customerid'].values
 # %%
 y_train = data_final['good_bad_num']
 X_train = data_final.loc[:, data_final.columns != 'good_bad_num']
-X_train = X.drop(['customerid'], axis=1)
-X_train = X.drop(['birthdate'], axis=1)
-
-
-# %%
-# Remove columns 
-X_train = X_train.drop(['customerid','birthdate','approveddate_x', 'creationdate_x','approveddate_y',
-'creationdate_y','closeddate','firstduedate','firstrepaiddate',
-'referredby_y','referredby_x'], axis = 1) 
 
 #%%
 # LOGISTIC REGRESSION FEATURE SELECTION
@@ -25,11 +16,6 @@ rfe = RFE(logreg, 20)
 rfe = rfe.fit(X_train, y_train.values.ravel())
 print(rfe.support_)
 print(rfe.ranking_)
-
-#%%
-logit_model=sm.Logit(y_train,X_train)
-result=logit_model.fit()
-print(result.summary2())
 
 #%%
 cols = ['longitude_gps','latitude_gps','systemloanid_x','loannumber_x',
@@ -42,36 +28,36 @@ cols = ['longitude_gps','latitude_gps','systemloanid_x','loannumber_x',
 
 X_train = X_train[cols]
 
-
+#%%
+# Breaking training set into smaller training and test set. another train and validation set
+x_train,x_test,y_train,y_test=train_test_split(X_train,y_train,test_size=0.2)     
 
 #%%
 # LOGISTIC REGRESSION
 logreg = LogisticRegression()
-logreg.fit(X_train.iloc[:10000,], y_train.iloc[:10000,])
+logreg.fit(x_train,y_train)
 
-y_test = y_train.iloc[10000:,]
-x_test = X_train.iloc[10000:,]
 
 print('Accuracy of Logistic regression classifier on training set: {:.2f}'
-     .format(logreg.score(X_train, y_train)))
+     .format(logreg.score(x_train, y_train)))
 print('Accuracy of Logistic regression classifier on test set: {:.2f}'
      .format(logreg.score(x_test, y_test)))
 
 
 #%%
 # DECISION TREE
-clf = DecisionTreeClassifier().fit(X_train, y_train)
+clf = DecisionTreeClassifier().fit(x_train, y_train)
 print('Accuracy of Decision Tree classifier on training set: {:.2f}'
-     .format(clf.score(X_train, y_train)))
+     .format(clf.score(x_train, y_train)))
 print('Accuracy of Decision Tree classifier on test set: {:.2f}'
      .format(clf.score(x_test, y_test)))
 
 # %%
 # K NEAREST NEIGHBOURS
 knn = KNeighborsClassifier()
-knn.fit(X_train, y_train)
+knn.fit(x_train, y_train)
 print('Accuracy of K-NN classifier on training set: {:.2f}'
-     .format(knn.score(X_train, y_train)))
+     .format(knn.score(x_train, y_train)))
 print('Accuracy of K-NN classifier on test set: {:.2f}'
      .format(knn.score(x_test, y_test)))
 
@@ -79,9 +65,9 @@ print('Accuracy of K-NN classifier on test set: {:.2f}'
 # %%
 # LINEAR DISCRIMINANT ANALYSIS
 lda = LinearDiscriminantAnalysis()
-lda.fit(X_train, y_train)
+lda.fit(x_train, y_train)
 print('Accuracy of LDA classifier on training set: {:.2f}'
-     .format(lda.score(X_train, y_train)))
+     .format(lda.score(x_train, y_train)))
 print('Accuracy of LDA classifier on test set: {:.2f}'
      .format(lda.score(x_test, y_test)))
 
@@ -89,9 +75,9 @@ print('Accuracy of LDA classifier on test set: {:.2f}'
 # %%
 # GAUSSIAN
 gnb = GaussianNB()
-gnb.fit(X_train, y_train)
+gnb.fit(x_train, y_train)
 print('Accuracy of GNB classifier on training set: {:.2f}'
-     .format(gnb.score(X_train, y_train)))
+     .format(gnb.score(x_train, y_train)))
 print('Accuracy of GNB classifier on test set: {:.2f}'
      .format(gnb.score(x_test, y_test)))
 
@@ -99,9 +85,9 @@ print('Accuracy of GNB classifier on test set: {:.2f}'
 # %%
  # SVM 
 svm = SVC()
-svm.fit(X_train, y_train)
+svm.fit(x_train, y_train)
 print('Accuracy of SVM classifier on training set: {:.2f}'
-     .format(svm.score(X_train, y_train)))
+     .format(svm.score(x_train, y_train)))
 print('Accuracy of SVM classifier on test set: {:.2f}'
      .format(svm.score(x_test, y_test)))
 
@@ -117,4 +103,16 @@ print(classification_report(y_test, pred))
 pred = knn.predict(x_test)
 print(confusion_matrix(y_test, pred))
 print(classification_report(y_test, pred))
+
+# %%
+# PREDICT LOAN GOOD BAD FLAG ON REAL TEST DATA
+df_test_merged = df_test_merged[cols]
+pred = clf.predict(df_test_merged)
+
+# Add predictions to test data set
+df_test_merged['Good_Bad_Flag'] = pred
+
+# Move to second column
+good_bad_col = df_test_merged.pop('Good_Bad_Flag')
+df_test_merged.insert(1, 'Good_Bad_Flag', good_bad_col)
 # %%

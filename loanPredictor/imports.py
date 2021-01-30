@@ -19,6 +19,8 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
+from sklearn.feature_selection import RFE
+from sklearn.model_selection import train_test_split
 
 
 # %%
